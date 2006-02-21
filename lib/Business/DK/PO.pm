@@ -1,6 +1,6 @@
 package Business::DK::PO;
 
-# $Id: PO.pm,v 1.2 2006/02/20 15:13:30 jonasbn Exp $
+# $Id: PO.pm,v 1.6 2006/02/20 22:03:10 jonasbn Exp $
 
 use strict;
 use integer;
@@ -11,9 +11,9 @@ require Exporter;
 
 my @controlcifers = qw(2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1);
 
-$VERSION   = '0.01';
+$VERSION   = '0.02';
 @ISA       = qw(Exporter);
-@EXPORT_OK = qw(calculate validate);
+@EXPORT_OK = qw(calculate validate _argument _content _length _calculate_sum);
 
 use constant CONTROLCODE_LENGTH => 16;
 use constant INVOICE_MINLENGTH  => 1;
@@ -61,7 +61,7 @@ sub validate {
 	
 	my $sum = _calculate_sum($controlnumber);
 	
-	if ($sum%10) {
+	if ($sum%MODULUS_OPERAND) {
 		return 0;
 	} else {
 		return 1;
@@ -137,6 +137,10 @@ __END__
 =head1 NAME
 
 Business::DK::PO - a danish postal order code generator/validator
+
+=head1 VERSION
+
+This documentation describes version 0.02
 
 =head1 SYNOPSIS
 
@@ -286,13 +290,21 @@ controlcifer array.
 
 =head1 EXPORTS
 
-Business::DK::PO exports two functions:
+Business::DK::PO exports on request:
 
 =over
 
 =item validate
 
 =item calculate
+
+=item _argument 
+
+=item _content 
+
+=item _length 
+
+=item _calculate_sum
 
 =back
 
