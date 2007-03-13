@@ -1,6 +1,6 @@
 ---
 name: Business-DK-PO
-version: 0.03
+version: 0.04
 author:
   - 'Jonas B. Nielsen, (jonasbn) <jonasbn@cpan.org>'
 abstract: a danish postal order code generator/validator
@@ -14,7 +14,7 @@ requires:
 provides:
   Business::DK::PO:
     file: lib/Business/DK/PO.pm
-    version: 0.03
+    version: 0.04
 generated_by: Module::Build version 0.2806
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.2.html

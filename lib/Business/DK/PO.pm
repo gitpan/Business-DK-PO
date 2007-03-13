@@ -12,7 +12,7 @@ require Exporter;
 
 my @controlcifers = qw(2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1);
 
-$VERSION   = '0.03';
+$VERSION   = '0.04';
 @ISA       = qw(Exporter);
 @EXPORT_OK = qw(calculate validate _argument _content _length _calculate_sum);
 
@@ -142,7 +142,7 @@ Business::DK::PO - a danish postal order code generator/validator
 
 =head1 VERSION
 
-This documentation describes version 0.02
+This documentation describes version 0.04
 
 =head1 SYNOPSIS
 
