@@ -1,25 +1,26 @@
 package Business::DK::PO;
 
-# $Id: PO.pm,v 1.8 2007/03/12 19:24:16 jonasbn Exp $
+# $Id: PO.pm,v 1.9 2007-03-13 19:12:21 jonasbn Exp $
 
 use strict;
 use warnings;
 use integer;
 use Carp qw(croak);
-use vars qw($VERSION @ISA @EXPORT_OK);
+use vars qw($VERSION @EXPORT_OK);
 
-require Exporter;
+use base qw(Exporter);
 
 my @controlcifers = qw(2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1);
 
-$VERSION   = '0.04';
-@ISA       = qw(Exporter);
-@EXPORT_OK = qw(calculate validate _argument _content _length _calculate_sum);
+$VERSION = '0.05';
+@EXPORT_OK
+    = qw(calculate validate validatePO _argument _content _length _calculate_sum);
 
 use constant CONTROLCODE_LENGTH => 16;
 use constant INVOICE_MINLENGTH  => 1;
 use constant INVOICE_MAXLENGTH  => 15;
 use constant MODULUS_OPERAND    => 10;
+use constant SUM_THRESHOLD      => 9;
 
 sub calculate {
     my ( $number, $maxlength, $minlength ) = @_;
@@ -49,6 +50,11 @@ sub calculate {
     $checkciffer = ( MODULUS_OPERAND - $mod );
 
     return ( $number . $checkciffer );
+}
+
+## no critic (RequireArgUnpacking)
+sub validatePO {
+    return validate(@_);
 }
 
 sub validate {
@@ -122,7 +128,10 @@ sub _calculate_sum {
         my $tmpsum2 = 0;
         my $tmpsum  = $numbers[$i] * $controlcifers[$i];
 
-        if ( $tmpsum > 9 ) {
+        if ( $tmpsum > SUM_THRESHOLD ) {
+
+            #TODO: address this construct
+            ## no critic (BuiltinFunctions::ProhibitVoidMap)
             map( { $tmpsum2 += $_ } split( //, $tmpsum ) );
             $tmpsum = $tmpsum2;
         }
@@ -138,36 +147,51 @@ __END__
 
 =head1 NAME
 
-Business::DK::PO - a danish postal order code generator/validator
+Business::DK::PO - danish postal order code generator/validator
 
 =head1 VERSION
 
-This documentation describes version 0.04
+This documentation describes version 0.05
 
 =head1 SYNOPSIS
 
-	use Business::DK::PO qw(validate);
+    use Business::DK::PO qw(validate);
 
-	my $rv;
-	eval {
-		$rv = validate(1234563891234562);
-	};
-	
-	if ($@) {
-		die "Code is not of the expected format - $@";
-	}
-	
-	if ($rv) {
-		print "Code is valid";
-	} else {
-		print "Code is not valid";
-	}
+    my $rv;
+    eval {
+        $rv = validate(1234563891234562);
+    };
+    
+    if ($@) {
+        die "Code is not of the expected format - $@";
+    }
+    
+    if ($rv) {
+        print "Code is valid";
+    } else {
+        print "Code is not valid";
+    }
 
 
-	use Business::DK::PO qw(calculate);
+    use Business::DK::PO qw(calculate);
 
-	my $code = calculate(1234);
+    my $code = calculate(1234);
 
+
+    #Using with Params::Validate
+    
+    use Params::Validate qw(:all);
+    use Business::DK::PO qw(validatePO);
+        
+    sub check_cpr {
+        validate( @_,
+        { po =>
+            { callbacks =>
+                { 'validate_po' => sub { validatePO($_[0]); } } } } );
+        
+        print $_[1]." is a valid PO\n";
+    
+    }
 
 =head1 DESCRIPTION
 
@@ -190,11 +214,11 @@ detail):
 
 =over
 
-=item _argument
+=item * _argument
 
-=item _content
+=item * _content
 
-=item _length
+=item * _length
 
 =back
 
@@ -203,6 +227,13 @@ based on the argument and the controlcifers array.
 
 The sum returned is checked using a modulus caluculation and based on its
 validity either 1 or 0 is returned.
+
+=head2 validatePO
+
+A wrapper for L</validate> with a name more suitable for importing, it is less
+common and therefor less intrusive.
+
+See L</validate> for details.
 
 =head2 calculate
 
@@ -223,11 +254,11 @@ detail):
 
 =over
 
-=item _argument
+=item * _argument
 
-=item _content
+=item * _content
 
-=item _length
+=item * _length
 
 =back
 
@@ -254,9 +285,9 @@ The B<_argument> function takes two arguments:
 
 =over
 
-=item minimum length required of number (mandatory)
+=item * minimum length required of number (mandatory)
 
-=item maximum length required of number (optional)
+=item * maximum length required of number (optional)
 
 =back
 
@@ -277,11 +308,11 @@ The B<_length> function takes the following arguments:
 
 =over
 
-=item number (mandatory), the number to be validated
+=item * number (mandatory), the number to be validated
 
-=item minimum length required of number (mandatory)
+=item * minimum length required of number (mandatory)
 
-=item maximum length required of number (optional)
+=item * maximum length required of number (optional)
 
 =back
 
@@ -296,23 +327,37 @@ Business::DK::PO exports on request:
 
 =over
 
-=item validate
+=item * L</validate>
 
-=item calculate
+=item * L</validatePO>
 
-=item _argument 
+=item * L</calculate>
 
-=item _content 
+=item * L</_argument> 
 
-=item _length 
+=item * L</_content>
 
-=item _calculate_sum
+=item * L</_length> 
+
+=item * L</_calculate_sum>
 
 =back
 
 =head1 TESTS
 
 Coverage of the test suite is at 100%
+
+    ---------------------------- ------ ------ ------ ------ ------ ------ ------
+    File                           stmt   bran   cond    sub    pod   time  total
+    ---------------------------- ------ ------ ------ ------ ------ ------ ------
+    blib/lib/Business/DK/PO.pm    100.0  100.0    n/a  100.0  100.0  100.0  100.0
+    Total                         100.0  100.0    n/a  100.0  100.0  100.0  100.0
+    ---------------------------- ------ ------ ------ ------ ------ ------ ------
+
+Test::Kwalitee passes
+
+Test::Perl::Critic passes at severity 1, brutal, with many policies disabled
+though, see F</perlcriticrc>.
 
 =head1 BUGS
 
@@ -342,7 +387,7 @@ Jonas B. Nielsen, (jonasbn) - C<< <jonasbn@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Business-DK-PO is (C) by Jonas B. Nielsen, (jonasbn) 2006
+Business-DK-PO is (C) by Jonas B. Nielsen, (jonasbn) 2006-2010
 
 Business-DK-PO is released under the artistic license
 

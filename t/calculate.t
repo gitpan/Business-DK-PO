@@ -1,4 +1,4 @@
-# $Id: calculate.t,v 1.2 2006/02/20 21:43:11 jonasbn Exp $
+# $Id: calculate.t,v 1.2 2006-02-20 21:43:11 jonasbn Exp $
 
 use strict;
 use Test::More tests => 32;

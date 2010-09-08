@@ -1,5 +1,6 @@
 Build.PL
 Changes
+Debian_CPANTS.txt
 INSTALL
 lib/Business/DK/PO.pm
 Makefile.PL
@@ -16,5 +17,7 @@ t/kwalitee.t
 t/perlcriticrc
 t/pod-coverage.t
 t/pod.t
+t/prerequisites.t
 t/validate.t
+t/validatePO.t
 TODO
