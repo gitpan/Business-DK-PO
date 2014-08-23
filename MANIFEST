@@ -12,6 +12,7 @@ t/_argument.t
 t/_calculate_sum.t
 t/_length.t
 t/calculate.t
+t/changes.t
 t/critic.t
 t/kwalitee.t
 t/perlcriticrc

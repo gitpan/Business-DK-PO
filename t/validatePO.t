@@ -1,4 +1,4 @@
-# $Id: validatePO.t 7215 2010-09-08 19:16:04Z jonasbn $
+# $Id$
 
 use strict;
 use Test::More tests => 9;
